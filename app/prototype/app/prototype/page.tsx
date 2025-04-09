@@ -1,147 +1,204 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Wifi, Smartphone, Info } from "lucide-react"
+import { useState } from "react"
 
-export default function LocalTesting() {
-  const [ipAddress, setIpAddress] = useState("")
-  const [port, setPort] = useState("3000")
-  const [qrCodeUrl, setQrCodeUrl] = useState("")
+export default function Prototype() {
+  const [activeTab, setActiveTab] = useState("learn")
+  const [text, setText] = useState("")
+  const [feedback, setFeedback] = useState(false)
 
-  // Get the local IP address
-  useEffect(() => {
-    // This is a simple way to try to get the local IP address
-    fetch("https://api.ipify.org?format=json")
-      .then((response) => response.json())
-      .then((data) => {
-        // This will get the external IP, but we'll use it as a fallback
-        setIpAddress(data.ip)
-      })
-      .catch(() => {
-        // Fallback to a common local IP
-        setIpAddress("192.168.1.x")
-      })
-  }, [])
-
-  // Generate QR code when IP or port changes
-  useEffect(() => {
-    const localUrl = `http://${ipAddress}:${port}`
-    setQrCodeUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(localUrl)}&size=200x200`)
-  }, [ipAddress, port])
+  const handleAnalyze = () => {
+    if (text.trim().length > 0) {
+      setFeedback(true)
+    }
+  }
 
   return (
-    <div className="container mx-auto max-w-md py-10 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-center">Prueba Local de Aplicación</CardTitle>
-          <CardDescription className="text-center">
-            Ejecuta tu prototipo localmente sin necesidad de hosting
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="instructions">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="instructions">Instrucciones</TabsTrigger>
-              <TabsTrigger value="qrcode">Código QR</TabsTrigger>
-            </TabsList>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 py-4 px-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+              <span className="text-white font-bold">W</span>
+            </div>
+            <span className="font-bold text-xl text-gray-800">WriteMentor</span>
+          </div>
+        </div>
+      </header>
 
-            <TabsContent value="instructions" className="space-y-4">
-              <div className="space-y-2 border rounded-md p-4 bg-slate-50">
-                <h3 className="font-medium flex items-center gap-2">
-                  <Wifi className="h-4 w-4" /> Paso 1: Configura tu servidor local
-                </h3>
-                <ol className="list-decimal pl-5 space-y-1 text-sm">
-                  <li>Asegúrate de que tu computadora y teléfono estén conectados a la misma red WiFi</li>
-                  <li>
-                    Ejecuta tu proyecto en tu computadora con{" "}
-                    <code className="bg-slate-200 px-1 rounded">npm run dev</code> o el comando correspondiente
-                  </li>
-                  <li>
-                    Encuentra la dirección IP de tu computadora:
-                    <ul className="list-disc pl-5 mt-1">
-                      <li>
-                        Windows: Ejecuta <code className="bg-slate-200 px-1 rounded">ipconfig</code> en CMD
-                      </li>
-                      <li>
-                        Mac/Linux: Ejecuta <code className="bg-slate-200 px-1 rounded">ifconfig</code> en Terminal
-                      </li>
-                    </ul>
-                  </li>
-                  <li>Anota la dirección IP (algo como 192.168.1.x) y el puerto (normalmente 3000)</li>
-                </ol>
+      <main className="flex-1 px-4 py-6 overflow-auto">
+        {activeTab === "learn" && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-gray-800">¿Qué quieres practicar hoy?</h1>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-orange-100 p-4 rounded-lg flex flex-col items-center">
+                <span className="text-orange-500 font-bold mb-1">✏️</span>
+                <span className="text-sm text-gray-700">Escritura</span>
               </div>
-
-              <div className="space-y-2 border rounded-md p-4 bg-slate-50">
-                <h3 className="font-medium flex items-center gap-2">
-                  <Smartphone className="h-4 w-4" /> Paso 2: Accede desde tu teléfono
-                </h3>
-                <ol className="list-decimal pl-5 space-y-1 text-sm">
-                  <li>Ve a la pestaña "Código QR" y escanea el código con tu teléfono</li>
-                  <li>
-                    O abre el navegador en tu teléfono y escribe:{" "}
-                    <code className="bg-slate-200 px-1 rounded">http://[IP-DE-TU-PC]:[PUERTO]</code>
-                  </li>
-                  <li>
-                    Por ejemplo: <code className="bg-slate-200 px-1 rounded">http://192.168.1.5:3000</code>
-                  </li>
-                </ol>
+              <div className="bg-blue-100 p-4 rounded-lg flex flex-col items-center">
+                <span className="text-blue-500 font-bold mb-1">📚</span>
+                <span className="text-sm text-gray-700">Gramática</span>
               </div>
+            </div>
 
-              <div className="space-y-2 border rounded-md p-4 bg-amber-50">
-                <h3 className="font-medium flex items-center gap-2 text-amber-800">
-                  <Info className="h-4 w-4" /> Nota importante
-                </h3>
-                <p className="text-sm text-amber-700">
-                  Esta solución funciona para prototipos web. Si estás desarrollando una app nativa para Android,
-                  considera usar herramientas como Expo para React Native, que facilitan las pruebas locales.
-                </p>
-              </div>
-            </TabsContent>
+            <h2 className="text-xl font-semibold text-gray-800">Temas de escritura</h2>
 
-            <TabsContent value="qrcode" className="space-y-4">
-              <div className="space-y-2">
-                <Label>Tu dirección IP local (edita si es necesario):</Label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={ipAddress}
-                    onChange={(e) => setIpAddress(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    placeholder="192.168.1.x"
-                  />
-                  <input
-                    type="text"
-                    value={port}
-                    onChange={(e) => setPort(e.target.value)}
-                    className="flex h-10 w-24 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    placeholder="3000"
-                  />
+            <div className="space-y-3">
+              <div className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center">
+                  <div className="bg-amber-500 p-4 flex items-center justify-center rounded-l-lg">
+                    <span className="text-white font-bold">📝</span>
+                  </div>
+                  <div className="p-4 flex-1">
+                    <h3 className="font-semibold text-gray-800">Inglés de Negocios</h3>
+                    <p className="text-sm text-gray-500">30+ ejercicios</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col items-center space-y-4 pt-4">
-                <p className="text-sm text-center">
-                  Escanea este código QR desde tu teléfono para acceder a:
-                  <br />
-                  <code className="bg-slate-200 px-1 rounded">
-                    http://{ipAddress}:{port}
-                  </code>
-                </p>
-                <div className="border p-4 rounded-md bg-white">
-                  <img src={qrCodeUrl || "/placeholder.svg"} alt="QR Code" width={200} height={200} />
+              <div className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center">
+                  <div className="bg-blue-500 p-4 flex items-center justify-center rounded-l-lg">
+                    <span className="text-white font-bold">✈️</span>
+                  </div>
+                  <div className="p-4 flex-1">
+                    <h3 className="font-semibold text-gray-800">Viajes y Cultura</h3>
+                    <p className="text-sm text-gray-500">25+ ejercicios</p>
+                  </div>
                 </div>
-                <Button onClick={() => window.open(`http://${ipAddress}:${port}`, "_blank")} className="w-full">
-                  Probar enlace en esta computadora
-                </Button>
               </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "practice" && (
+          <div className="space-y-6">
+            <div className="bg-white p-4 rounded-lg border shadow-sm">
+              <h2 className="font-bold text-lg mb-2">Ejercicio de escritura</h2>
+              <div className="bg-gray-100 p-4 rounded-md mb-4">
+                <p>
+                  Write a professional email to a potential business partner proposing a collaboration on a new
+                  project. Include an introduction, the benefits of collaboration, and a call to action.
+                </p>
+              </div>
+
+              <textarea 
+                placeholder="Start writing your response here..." 
+                className="w-full border rounded-md p-2 min-h-[200px]"
+              ></textarea>
+
+              <button className="w-full bg-orange-500 text-white py-2 rounded-md mt-4 hover:bg-orange-600">
+                Submit for Feedback
+              </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "ai" && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-gray-800">AI Writing Coach</h1>
+
+            <div className="bg-white p-4 rounded-lg border shadow-sm">
+              <p className="text-gray-600 mb-4">
+                Paste your English text below and our AI coach will analyze it, providing feedback on grammar,
+                vocabulary, style, and structure.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <textarea
+                placeholder="Paste or write your text here for AI analysis..."
+                className="w-full border rounded-md p-2 min-h-[150px]"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+              ></textarea>
+            </div>
+
+            <button 
+              className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600"
+              onClick={handleAnalyze}
+            >
+              Analyze Text ✨
+            </button>
+
+            {feedback && (
+              <div className="space-y-4 mt-6">
+                <div className="bg-white p-4 rounded-lg border shadow-sm mb-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-green-500">✓</span>
+                    <div>
+                      <h3 className="font-medium text-gray-800">Strengths</h3>
+                      <ul className="mt-2 text-sm text-gray-600 list-disc pl-5 space-y-1">
+                        <li>Good vocabulary usage</li>
+                        <li>Clear structure in your writing</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border shadow-sm">
+                  <div className="flex items-start gap-3">
+                    <span className="text-amber-500">✨</span>
+                    <div>
+                      <h3 className="font-medium text-gray-800">Suggestions</h3>
+                      <ul className="mt-2 text-sm text-gray-600 list-disc pl-5 space-y-1">
+                        <li>Try using more varied sentence structures</li>
+                        <li>Consider adding more specific examples</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "saved" && (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-gray-800">Saved Items</h1>
+
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <span className="text-4xl mb-4">🔖</span>
+              <h2 className="text-xl font-semibold text-gray-700">No saved items yet</h2>
+              <p className="text-gray-500 mt-2">Your saved exercises and writing samples will appear here</p>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <nav className="bg-white border-t border-gray-200 py-2">
+        <div className="grid grid-cols-4 gap-1">
+          <button
+            className={`flex flex-col items-center py-2 ${activeTab === "learn" ? "text-orange-500" : "text-gray-500"}`}
+            onClick={() => setActiveTab("learn")}
+          >
+            <span className="text-lg mb-1">📚</span>
+            <span className="text-xs">Learn</span>
+          </button>
+          <button
+            className={`flex flex-col items-center py-2 ${activeTab === "practice" ? "text-orange-500" : "text-gray-500"}`}
+            onClick={() => setActiveTab("practice")}
+          >
+            <span className="text-lg mb-1">✏️</span>
+            <span className="text-xs">Practice</span>
+          </button>
+          <button
+            className={`flex flex-col items-center py-2 ${activeTab === "ai" ? "text-orange-500" : "text-gray-500"}`}
+            onClick={() => setActiveTab("ai")}
+          >
+            <span className="text-lg mb-1">🧠</span>
+            <span className="text-xs">AI Coach</span>
+          </button>
+          <button
+            className={`flex flex-col items-center py-2 ${activeTab === "saved" ? "text-orange-500" : "text-gray-500"}`}
+            onClick={() => setActiveTab("saved")}
+          >
+            <span className="text-lg mb-1">🔖</span>
+            <span className="text-xs">Saved</span>
+          </button>
+        </div>
+      </nav>
     </div>
   )
 }
